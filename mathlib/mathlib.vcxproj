@@ -315,6 +315,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="almostequal.cpp" />
     <ClCompile Include="anorms.cpp" />
     <ClCompile Include="bumpvects.cpp" />
     <ClCompile Include="color_conversion.cpp" />
@@ -329,6 +330,7 @@
     <ClCompile Include="randsse.cpp" />
     <ClCompile Include="simdvectormatrix.cpp" />
     <ClCompile Include="sparse_convolution_noise.cpp" />
+    <ClCompile Include="spherical.cpp" />
     <ClCompile Include="sse.cpp" />
     <ClCompile Include="sseconst.cpp" />
     <ClCompile Include="ssenoise.cpp" />
