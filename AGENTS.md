@@ -75,6 +75,7 @@ SteamFileDownloader get 1422450 all --output <dir> -- "regex:\.(dll|so)$"
 - For primitives prefer hl2sdk defined types, `uint8` instead of `std::uint8_t`, `uint16`, `uint32`, etc. You can use plain `int`, `float`, `double` where applicable. Don't use `long`, `uint`.
 - Match the file's style, line endings and encoding, and don't restyle code you're only touching.
 - A method's name and arguments should say what it does. Comment only a catch or caveat users need to know, never where something is called from or how it was found; no vtable indices, IDA names or addresses.
+- When implementing a method body for a class/struct keep simple/one-line methods inline. Put complex bodies at the bottom of the header or in an existing .cpp file (only if it already exists else use header file).
 - Comments that describe or guess what something does, to help others work it out later, start with `AMNOTE: `, like `// AMNOTE: Called only when gpGlobals->maxplayer == 1 on player_connect_full`. Mark stubbed or incomplete classes the same way. Don't remove such notes until they're verified.
 - Keep comments while they're still true.
 - When the engine removes an API, use what replaced it instead of keeping a compatibility wrapper. Delete removed virtuals rather than commenting them out or wrapping them in `#if 0`. A renamed type may keep a `using` alias with `// AMNOTE: Deprecated, use X instead`.
