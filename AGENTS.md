@@ -10,7 +10,7 @@ alliedmodders/s2sdk holds the Source 2 SDKs, one branch per game: `cs2`, `dota` 
 - Game classes, enums and flags the schema exposes come from schema dumps; don't copy them in by hand.
 - Don't reference game DLL classes the SDK doesn't define (like `CBaseEntity`) in signatures; use `CEntityInstance` or a forward declaration.
 - Correctness comes before downstream builds: don't fake a removed API to keep Metamod or plugins compiling; let the compiler point at what changed.
-- Don't use leaked code, builds or symbols; everything comes from the public game binaries. Code taken from elsewhere (preferably whole classes from the public Source SDK 2013) keeps its license, and its source goes in the PR description or commit body.
+- Don't use leaked code in any form, or code whose license forbids this; You can use debug builds of the games, and use names/types/logic from it only if it actually matches the up to date game builds and you have verified so. Code taken from elsewhere (preferably whole classes from the public Source SDK 2013) keeps its license, and its source goes in the PR description or commit body.
 
 ## Branches
 
