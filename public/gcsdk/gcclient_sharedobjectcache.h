@@ -16,6 +16,8 @@
 namespace GCSDK
 {
 
+class CGCClientSharedObjectCache;
+
 /// Enumerate different events that might trigger a callback to an ISharedObjectListener
 enum ESOCacheEvent
 {
@@ -42,6 +44,31 @@ enum ESOCacheEvent
 
 	/// A lister was removed from the cache
 	eSOCacheEvent_ListenerRemoved = 6,
+};
+
+//----------------------------------------------------------------------------
+// Purpose: Allow game components to register themselves to hear about inventory
+//			changes when they are received from the server
+//----------------------------------------------------------------------------
+abstract_class ISharedObjectListener
+{
+public:
+	/// Called when a new object is created in a cache we are currently subscribed to, or when we are added
+	/// as a listener to a cache which already has objects in it
+	virtual void SOCreated( SOID_t owner, const CSharedObject *pObject, ESOCacheEvent eEvent ) = 0;
+
+	/// Called when an object is updated in a cache we are currently subscribed to.
+	virtual void SOUpdated( SOID_t owner, const CSharedObject *pObject, ESOCacheEvent eEvent ) = 0;
+
+	/// Called when an object is about to be deleted in a cache we are currently subscribed to.
+	/// The object will have already been removed from the cache, but is still valid.
+	virtual void SODestroyed( SOID_t owner, const CSharedObject *pObject, ESOCacheEvent eEvent ) = 0;
+
+	/// Called to notify a listener that he is subscribed to the cache.
+	virtual void SOCacheSubscribed( SOID_t owner, CGCClientSharedObjectCache *pSOC, ESOCacheEvent eEvent ) = 0;
+
+	/// Called to notify a listener that he is no longer subscribed to the cache.
+	virtual void SOCacheUnsubscribed( SOID_t owner, CGCClientSharedObjectCache *pSOC, ESOCacheEvent eEvent ) = 0;
 };
 
 } // namespace GCSDK
