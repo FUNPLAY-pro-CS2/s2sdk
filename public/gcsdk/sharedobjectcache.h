@@ -44,6 +44,54 @@ private:
 	int m_nTypeID;
 };
 
+//----------------------------------------------------------------------------
+// Purpose: A cache of a bunch of shared objects of different types. This class
+//			is shared between clients, gameservers, and the GC and is
+//			responsible for sending messages from the GC to cause object
+//			creation/destruction/updating on the clients/gameservers.
+//----------------------------------------------------------------------------
+abstract_class CSharedObjectCache
+{
+public:
+	virtual ~CSharedObjectCache();
+
+	virtual SOID_t GetOwner() const = 0;
+
+	virtual bool AddObject( CSharedObject *pSharedObject );
+	virtual bool AddObjectClean( CSharedObject *pSharedObject );
+	virtual CSharedObject *RemoveObject( const CSharedObject &soIndex );
+	virtual bool RemoveAllObjectsWithoutDeleting();
+
+	// Returns NULL if the cache has no objects of this type
+	CSharedObjectTypeCache *FindBaseTypeCache( int nClassID ) const
+	{
+		FOR_EACH_VEC( m_vecTypeCaches, i )
+		{
+			if ( m_vecTypeCaches[i]->GetTypeID() == nClassID )
+				return m_vecTypeCaches[i];
+		}
+
+		return NULL;
+	}
+
+	void SetVersion( uint64 ulVersion ) { m_ulVersion = ulVersion; }
+	uint64 GetVersion() const { return m_ulVersion; }
+	virtual void MarkDirty() {}
+
+	virtual void Dump() const;
+
+protected:
+	virtual CSharedObjectTypeCache *AllocateTypeCache( int nClassID ) const = 0;
+	CSharedObjectTypeCache *GetTypeCacheByIndex( int nIndex ) { return m_vecTypeCaches.IsValidIndex( nIndex ) ? m_vecTypeCaches[nIndex] : NULL; }
+	int GetTypeCacheCount() const { return m_vecTypeCaches.Count(); }
+
+	uint64 m_ulVersion;
+
+private:
+	// Sorted by type ID
+	CUtlVector<CSharedObjectTypeCache *> m_vecTypeCaches;
+};
+
 } // namespace GCSDK
 
 #endif // SHAREDOBJECTCACHE_H
