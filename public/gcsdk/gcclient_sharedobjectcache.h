@@ -85,6 +85,33 @@ private:
 	int m_unk001;
 };
 
+//----------------------------------------------------------------------------
+// Purpose: A cache of a bunch of shared objects of different types. This class
+//			is shared between clients, gameservers, and the GC and is
+//			responsible for sending messages from the GC to cause object
+//			creation/destruction/updating on the clients/gameservers.
+//----------------------------------------------------------------------------
+class CGCClientSharedObjectCache : public CSharedObjectCache
+{
+public:
+	virtual ~CGCClientSharedObjectCache();
+
+	bool BIsInitialized() const { return m_bInitialized; }
+	bool BIsSubscribed() const { return m_bSubscribed; }
+
+	virtual SOID_t GetOwner() const override { return m_IDOwner; }
+
+	CGCClientSharedObjectTypeCache *FindTypeCache( int nClassID ) const { return (CGCClientSharedObjectTypeCache *)FindBaseTypeCache( nClassID ); }
+
+protected:
+	virtual CSharedObjectTypeCache *AllocateTypeCache( int nClassID ) const override;
+
+private:
+	SOID_t m_IDOwner;
+	bool m_bInitialized;
+	bool m_bSubscribed;
+};
+
 } // namespace GCSDK
 
 #endif // GCCLIENT_SHAREDOBJECTCACHE_H
