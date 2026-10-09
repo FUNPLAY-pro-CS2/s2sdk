@@ -71,6 +71,20 @@ public:
 	virtual void SOCacheUnsubscribed( SOID_t owner, CGCClientSharedObjectCache *pSOC, ESOCacheEvent eEvent ) = 0;
 };
 
+//----------------------------------------------------------------------------
+// Purpose: The part of a shared object cache that handles all objects of a
+//			single type.
+//----------------------------------------------------------------------------
+class CGCClientSharedObjectTypeCache : public CSharedObjectTypeCache
+{
+public:
+	virtual ~CGCClientSharedObjectTypeCache();
+
+private:
+	// AMNOTE: Set to 0 by AllocateTypeCache
+	int m_unk001;
+};
+
 } // namespace GCSDK
 
 #endif // GCCLIENT_SHAREDOBJECTCACHE_H
