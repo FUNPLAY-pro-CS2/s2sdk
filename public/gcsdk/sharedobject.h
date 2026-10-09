@@ -52,6 +52,8 @@ public:
 	bool BIsKeyEqual( const CSharedObject &soRHS ) const { return !BIsKeyLess( soRHS ) && !soRHS.BIsKeyLess( *this ); }
 };
 
+typedef CUtlVectorFixedGrowable<CSharedObject *, 1> CSharedObjectVec;
+
 } // namespace GCSDK
 
 #endif // SHAREDOBJECT_H
