@@ -123,9 +123,13 @@ class CGCClientSharedObjectCache : public CSharedObjectCache
 public:
 	virtual ~CGCClientSharedObjectCache();
 
+	/// Have we received at least one update from the GC?
 	bool BIsInitialized() const { return m_bInitialized; }
+
+	/// Are we currently subscribed to updates from the GC?
 	bool BIsSubscribed() const { return m_bSubscribed; }
 
+	/// Who owns this cache?
 	virtual SOID_t GetOwner() const override { return m_IDOwner; }
 
 	CGCClientSharedObjectTypeCache *FindTypeCache( int nClassID ) const { return (CGCClientSharedObjectTypeCache *)FindBaseTypeCache( nClassID ); }
