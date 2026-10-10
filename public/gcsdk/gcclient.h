@@ -77,6 +77,7 @@ protected:
 	ISteamUtils *m_pSteamUtils;
 	CUtlLeanVector<uint8> m_memMsg;
 
+	// local job handling
 	CJobMgr m_JobMgr;
 
 	// Shared object caches
