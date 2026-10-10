@@ -62,7 +62,7 @@ public:
 	virtual CSharedObject *RemoveObject( const CSharedObject &soIndex );
 	virtual bool RemoveAllObjectsWithoutDeleting();
 
-	// Returns NULL if the cache has no objects of this type
+	//called to find the type cache for the specified class ID. This will return NULL if one does not exist
 	CSharedObjectTypeCache *FindBaseTypeCache( int nClassID ) const
 	{
 		FOR_EACH_VEC( m_vecTypeCaches, i )
