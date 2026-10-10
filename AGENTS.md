@@ -86,7 +86,7 @@ SteamFileDownloader get 1422450 all --output <dir> -- "regex:\.(dll|so)$"
 - When the engine removes an API, use what replaced it instead of keeping a compatibility wrapper. Delete removed virtuals rather than commenting them out or wrapping them in `#if 0`. A renamed type may keep a `using` alias with `// AMNOTE: Deprecated, use X instead`.
 - Update Source 1 leftovers that a game still has (found by RTTI, exports or strings) for Source 2 in place instead of deleting them; Attempt to preserve all the functionality it previously had where applicable. delete only what no game has.
 - New classes the game doesn't export are header-only, without extra .cpp files. Don't move code that's already in a .cpp into a header.
-- Do wrap raw `malloc`/`free` calls in `memdbgon.h`/`memdbgoff.h` includes if the game confirms the usage of `g_pMemAlloc` in these places. Don't use `g_pMemAlloc`'s `Free`/`Alloc` manually.
+- Do wrap raw `malloc`/`free`/`realloc` calls in `memdbgon.h`/`memdbgoff.h` includes if the game confirms the usage of `g_pMemAlloc` in these places. Don't use `g_pMemAlloc`'s `Free`/`Alloc`/`Realloc` manually.
 - Prefer plain getters to reimplementing removed virtuals. Use typedefs for function pointers, and bitfields where the engine packs bits.
 - No `static_assert`s for sizes or offsets, and no explicit padding the compiler adds anyway.
 - Use the SDK's platform and compiler macros (`PLATFORM_LINUX`, `PLATFORM_64BITS`, `COMPILER_MSVC64`, `COMPILER_GCC`).
