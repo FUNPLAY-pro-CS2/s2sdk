@@ -16,6 +16,7 @@
 namespace GCSDK
 {
 
+// used for message types in GCSDK where we don't have the actual enum
 typedef uint32 MsgType_t;
 
 // Set in the message type of every message that has a CMsgProtoBufHeader
