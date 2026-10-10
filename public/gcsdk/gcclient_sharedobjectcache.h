@@ -55,19 +55,46 @@ abstract_class ISharedObjectListener
 public:
 	/// Called when a new object is created in a cache we are currently subscribed to, or when we are added
 	/// as a listener to a cache which already has objects in it
+	///
+	/// eEvent will be one of:
+	/// - eSOCacheEvent_Subscribed
+	/// - eSOCacheEvent_Resubscribed
+	/// - eSOCacheEvent_Incremental
 	virtual void SOCreated( SOID_t owner, const CSharedObject *pObject, ESOCacheEvent eEvent ) = 0;
 
 	/// Called when an object is updated in a cache we are currently subscribed to.
+	///
+	/// eEvent will be one of:
+	/// - eSOCacheEvent_Resubscribed
+	/// - eSOCacheEvent_Incremental
 	virtual void SOUpdated( SOID_t owner, const CSharedObject *pObject, ESOCacheEvent eEvent ) = 0;
 
 	/// Called when an object is about to be deleted in a cache we are currently subscribed to.
 	/// The object will have already been removed from the cache, but is still valid.
+	///
+	/// eEvent will be one of:
+	/// - eSOCacheEvent_Incremental
+	/// - eSOCacheEvent_Resubscribed
 	virtual void SODestroyed( SOID_t owner, const CSharedObject *pObject, ESOCacheEvent eEvent ) = 0;
 
 	/// Called to notify a listener that he is subscribed to the cache.
+	///
+	/// eEvent will be one of:
+	/// - eSOCacheEvent_Subscribed
+	/// - eSOCacheEvent_Resubscribed
+	///
+	/// A listener is guaranteed that it will not receive incremental updates (SOCreated,
+	/// SOUpdated, SODestroyed) while not subscribed.  (Before the SOCacheSubscribed or
+	/// after SOCacheUnsubscribed.)  However, note that it may be possible to receive
+	/// an SOCacheSubscribed message while already subscribed.  This can happen if the
+	/// GC loses and restores connection, or otherwise decides that a full update is
+	/// necessary.
 	virtual void SOCacheSubscribed( SOID_t owner, CGCClientSharedObjectCache *pSOC, ESOCacheEvent eEvent ) = 0;
 
 	/// Called to notify a listener that he is no longer subscribed to the cache.
+	///
+	/// eEvent will be one of:
+	/// - eSOCacheEvent_Unsubscribed
 	virtual void SOCacheUnsubscribed( SOID_t owner, CGCClientSharedObjectCache *pSOC, ESOCacheEvent eEvent ) = 0;
 };
 
