@@ -211,15 +211,6 @@ typedef void (CBaseEntity::*inputfunc_t)(inputdata_t &data);
 
 struct datamap_t;
 
-enum PredictionCopyType_t
-{
-	PC_NON_NETWORKED_ONLY = 0,
-	PC_NETWORKED_ONLY,
-
-	PC_COPYTYPE_COUNT,
-	PC_EVERYTHING = PC_COPYTYPE_COUNT,
-};
-
 // Size: 0x38
 struct typedescription_t
 {
