@@ -20,6 +20,18 @@ s2sdk_protobufs(s2sdk_check
 	common/networkbasetypes.proto
 	common/netmessages.proto
 	common/valveextensions.proto
+	# The typed net messages' protos and what they import
+	networksystem/networksystem_protomessages.proto
+	game/shared/usermessages.proto
+	game/shared/gameevents.proto
+	game/shared/te.proto
+	game/shared/clientmessages.proto
+	gcsdk/steammessages.proto
+	common/engine_gcmessages.proto
+	gcsdk/gcsdk_gcmessages.proto
+	game/shared/cstrike15/cstrike15_gcmessages.proto
+	game/shared/cstrike15/cstrike15_usermessages.proto
+	game/shared/cs/cs_gameevents.proto
 	# Messages for the tests, from a proto without imports
 	common/source2_steam_stats.proto
 )
