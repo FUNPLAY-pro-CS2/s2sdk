@@ -99,6 +99,32 @@ enum NetChannelBufType_t : int8
 	BUF_VOICE,
 };
 
+// The group a net message is registered under, its IProtobufBinding::GetGroup() name in the comment
+enum SignonGroup_t
+{
+	SG_INVALID = -1,	// "Unknown"
+	SG_GENERIC = 0,		// "Generic"
+	SG_LOCALPLAYER,		// "Local Player"
+	SG_OTHERPLAYER,		// "Other Players"
+	SG_ENTITIES,		// "Entities"
+	SG_SOUNDS,			// "Sounds"
+	SG_EVENTS,			// "Events"
+	SG_VOICE,			// "Voice"
+	SG_STRINGTABLE,		// "String Table"
+	SG_MOVE,			// "Move"
+	SG_STRINGCMD,		// "String Command"
+	SG_SIGNON,			// "Signon"
+	SG_SYSTEM,			// "System"
+	SG_DECALS,			// "Decals"
+	SG_USERMSG,			// "User Messages"
+	SG_CLIENTMSG,		// "Client Messages"
+	SG_SPAWNGROUPS,		// "Spawn Groups"
+	SG_ENGINE,			// "Game Engine"
+	SG_HLTVREPLAY,		// "Hltv Replay"
+
+	SG_TOTAL
+};
+
 DECLARE_POINTER_HANDLE( FlattenedSerializerHandle_t );
 
 #endif // NETWORKSYSTEMTYPES_H
