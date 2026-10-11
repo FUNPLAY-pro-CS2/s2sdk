@@ -97,6 +97,27 @@ public:
 	CNetMessagePB( const CNetMessagePB & ) = delete;
 };
 
+// AMNOTE: The rest of what the game's CNetMessagePB< ID, PROTO_TYPE, SIGNON_GROUP, BUF_TYPE, OK_TO_REDISPATCH >
+// is instantiated with, for the typed messages (netmessages.h, usermessages.h, ...).
+// Like the stub above it only describes game constructed objects: no members and no virtuals
+// of its own, so a CNetMessagePB<PROTO_TYPE> the game hands out can be cast to it.
+// Example usage:
+// INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessageById( CCLCMsg_Move_t::kMessageId );
+template<NetworkMessageId ID, typename PROTO_TYPE, SignonGroup_t SIGNON_GROUP = SG_GENERIC, NetChannelBufType_t BUF_TYPE = BUF_RELIABLE, bool OK_TO_REDISPATCH = false>
+class CNetMessagePBTyped : public CNetMessagePB<PROTO_TYPE>
+{
+public:
+	using ProtoType_t = PROTO_TYPE;
+
+	static constexpr NetworkMessageId kMessageId = ID;
+	static constexpr SignonGroup_t kSignonGroup = SIGNON_GROUP;
+	static constexpr NetChannelBufType_t kBufType = BUF_TYPE;
+	static constexpr bool kOkToRedispatch = OK_TO_REDISPATCH;
+
+	CNetMessagePBTyped() = delete;
+	CNetMessagePBTyped( const CNetMessagePBTyped & ) = delete;
+};
+
 abstract_class IProtobufBinding
 {
 public:
