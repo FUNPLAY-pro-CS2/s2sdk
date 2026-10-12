@@ -1,6 +1,13 @@
 # vim: set ts=2 sw=2 tw=99 noet ft=python:
 import os
-from ambuild2 import util
+
+# The build settings, split the same way as the CMake side (makefiles/cmake/):
+# shared.ambuild <-> shared.cmake, linux.ambuild <-> linux.cmake,
+# windows.ambuild <-> windows.cmake, AMBuilder <-> CMakeBuilder.cmake,
+# package.ambuild <-> package.cmake, check.ambuild <-> check.cmake.
+Shared = builder.Import('makefiles/ambuild/shared.ambuild')
+Linux = builder.Import('makefiles/ambuild/linux.ambuild')
+Windows = builder.Import('makefiles/ambuild/windows.ambuild')
 
 class SDKConfig(object):
   def __init__(self):
@@ -22,94 +29,23 @@ class SDKConfig(object):
       return 'Debug'
     return 'Release'
 
-  def configure_cxx(self, cxx):
-    if cxx.like('gcc'):
-      self.configure_gcc(cxx)
-    elif cxx.family == 'msvc':
-      self.configure_msvc(cxx)
+  # The manifests the SDK is checked against, the way plugins build against it
+  @property
+  def manifests(self):
+    return builder.options.s2sdk_manifests or builder.options.hl2sdk_manifests
 
-    # Optimization
-    if builder.options.opt == '1':
-      cxx.defines += ['NDEBUG']
-
-    # Debugging
-    if builder.options.debug == '1':
-      cxx.defines += ['DEBUG', '_DEBUG']
-
-    cxx.defines += ['X64BITS', 'PLATFORM_64BITS', '_LIB']
-
-    # Platform-specifics
+  def Platform(self, cxx):
     if cxx.target.platform == 'linux':
-      self.configure_linux(cxx)
-    elif cxx.target.platform == 'windows':
-      self.configure_windows(cxx)
-
-  def configure_gcc(self, cxx):
-    cxx.cflags += [
-      '-Wall',
-      '-Werror',
-      '-Wno-overloaded-virtual',
-      '-Wno-non-virtual-dtor',
-      '-Wno-delete-non-virtual-dtor',
-      '-Wno-invalid-offsetof',
-      '-Wno-unknown-pragmas',
-      '-Wno-unused',
-      '-Wno-narrowing',
-      '-Wno-register',
-      '-fPIC'
-    ]
-
-    cxx.defines += [
-      'COMPILER_GCC'
-    ]
-
-    cxx.cxxflags += [
-      '-std=c++20'
-    ]
-
-    if builder.options.opt == '1':
-      cxx.cflags += ['-O3']
-
-    if builder.options.debug == '1':
-      cxx.cflags += ['-g3']
-
-  def configure_msvc(self, cxx):
-    cxx.defines += ['COMPILER_MSVC', 'COMPILER_MSVC64']
-
-    cxx.cxxflags += [
-      '/std:c++20'
-    ]
-
-    if builder.options.opt == '1':
-      cxx.cflags += ['/Ox', '/Zo']
-
-    if builder.options.debug == '1':
-      cxx.cflags += ['/MTd', '/Od', '/RTC1']
-      cxx.linkflags += ['/NODEFAULTLIB:libcmt']
-      # The game is built without iterator debugging, which changes the layout of STL types,
-      # like the strings in protobuf messages that plugins share with the game
-      cxx.defines += ['_ITERATOR_DEBUG_LEVEL=0']
-
-  def configure_linux(self, cxx):
-    cxx.defines += ['_LINUX', 'LINUX', 'POSIX', 'GNUC']
-    cxx.cflags += ['-march=nocona', '-mmmx', '-msse', '-msse2']
-
-    # Set of defines required by the HL2SDK
-    cxx.defines += [
-      '_finite=finite',
-      'stricmp=strcasecmp', '_stricmp=strcasecmp',
-      'strnicmp=strncasecmp', '_strnicmp=strncasecmp',
-      'strcmpi=strcasecmp',
-      '_vsnprintf=vsnprintf',
-      '_alloca=alloca'
-    ]
-
-  def configure_windows(self, cxx):
-    cxx.defines += ['_WINDOWS', 'WINDOWS', 'WIN32', 'WIN64', '_CRT_SECURE_NO_DEPRECATE', '_CRT_NONSTDC_NO_DEPRECATE']
+      return Linux
+    if cxx.target.platform == 'windows':
+      return Windows
+    raise Exception('Unsupported target platform: {0}'.format(cxx.target.platform))
 
   def configure(self):
+    # makefiles/ambuild/shared.ambuild, then linux.ambuild or windows.ambuild
     for cxx in self.targets:
-      self.configure_cxx(cxx)
+      Shared.ConfigureCxx(cxx, builder.options)
+      self.Platform(cxx).ConfigureCxx(cxx, builder.options)
 
   def ConfigureLibrary(self, project, compiler, context):
     binary = project.Configure(compiler, project.name, '{0} - {1}'.format(self.tag, compiler.target.arch))
@@ -123,9 +59,7 @@ class SDKConfig(object):
 HL2SDK = SDKConfig()
 HL2SDK.configure()
 
-BuildScripts = ['interfaces/AMBuilder', 'mathlib/AMBuilder', 'thirdparty/protobuf-3.21.8/AMBuilder', 'PackageScript']
-if builder.options.hl2sdk_manifests:
-  BuildScripts += ['CheckScript']
-# Turn off the 'lib' prefix for all platform, we will add it if we need to
-util.StaticLibPrefix = ''
+BuildScripts = ['makefiles/ambuild/AMBuilder', 'makefiles/ambuild/package.ambuild']
+if HL2SDK.manifests:
+  BuildScripts += ['makefiles/ambuild/check.ambuild']
 builder.Build(BuildScripts, { 'HL2SDK': HL2SDK })

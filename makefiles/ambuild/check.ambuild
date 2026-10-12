@@ -1,8 +1,10 @@
 # vim: set ts=2 sw=2 tw=99 noet ft=python:
 import os
 
+# AMBuild twin of makefiles/cmake/check.cmake.
+#
 # Compiles every header on its own, and the sources that plugins compile themselves, into a library
-# configured and linked through hl2sdk-manifests like plugins are. A header missing an include or out of date
+# configured and linked through s2sdk-manifests (or hl2sdk-manifests) like plugins are. A header missing an include or out of date
 # with the rest of the SDK fails the build, and so does a declaration the SDK's libraries don't export.
 
 builder.SetBuildFolder('check')
@@ -43,16 +45,16 @@ for header in sorted(headers):
 for folder in ['entity2', 'tier0_perproject']:
   for file in sorted(os.listdir(os.path.join(builder.sourcePath, folder))):
     if file.endswith('.cpp'):
-      sources.append(os.path.join(folder, file))
-sources.append(os.path.join('public', 'tier0', 'memoverride.cpp'))
+      sources.append(os.path.join(builder.sourcePath, folder, file))
+sources.append(os.path.join(builder.sourcePath, 'public', 'tier0', 'memoverride.cpp'))
 
 # Templates only compile when instantiated, so these instantiate the ones plugins use. An explicit
 # instantiation compiles every member of a class, but not those of its base classes, so bases are named too.
 for file in sorted(os.listdir(os.path.join(builder.sourcePath, 'tests'))):
   if file.endswith('.cpp'):
-    sources.append(os.path.join('tests', file))
+    sources.append(os.path.join(builder.sourcePath, 'tests', file))
 
-SdkHelpers = builder.Eval(os.path.join(os.path.abspath(builder.options.hl2sdk_manifests), 'SdkHelpers.ambuild'), {
+SdkHelpers = builder.Eval(os.path.join(os.path.abspath(HL2SDK.manifests), 'SdkHelpers.ambuild'), {
   'Project': 'sdkcheck'
 })
 SdkHelpers.find_sdk_path = lambda name: builder.sourcePath
@@ -87,9 +89,9 @@ builder.Add(project)
 # Runs KeyValues3 against tier0, so it needs the game's tier0 to start
 kv3test = builder.ProgramProject('keyvalues3_test')
 kv3test.sources = [
-  os.path.join('tests', 'run', 'keyvalues3.cpp'),
-  os.path.join('tier0_perproject', 'keyvalues3.cpp'),
-  os.path.join('public', 'tier0', 'memoverride.cpp'),
+  os.path.join(builder.sourcePath, 'tests', 'run', 'keyvalues3.cpp'),
+  os.path.join(builder.sourcePath, 'tier0_perproject', 'keyvalues3.cpp'),
+  os.path.join(builder.sourcePath, 'public', 'tier0', 'memoverride.cpp'),
 ]
 
 for sdk_target in SdkHelpers.sdk_targets:
@@ -101,8 +103,8 @@ builder.Add(kv3test)
 # Iterates the utl containers, which allocate through tier0
 itertest = builder.ProgramProject('utliterators_test')
 itertest.sources = [
-  os.path.join('tests', 'run', 'utliterators.cpp'),
-  os.path.join('public', 'tier0', 'memoverride.cpp'),
+  os.path.join(builder.sourcePath, 'tests', 'run', 'utliterators.cpp'),
+  os.path.join(builder.sourcePath, 'public', 'tier0', 'memoverride.cpp'),
 ]
 
 for sdk_target in SdkHelpers.sdk_targets:
@@ -114,8 +116,8 @@ builder.Add(itertest)
 # Adds and finds symbols through CUtlSymbolTableLarge's alternate keys
 symtest = builder.ProgramProject('utlsymbollarge_test')
 symtest.sources = [
-  os.path.join('tests', 'run', 'utlsymbollarge.cpp'),
-  os.path.join('public', 'tier0', 'memoverride.cpp'),
+  os.path.join(builder.sourcePath, 'tests', 'run', 'utlsymbollarge.cpp'),
+  os.path.join(builder.sourcePath, 'public', 'tier0', 'memoverride.cpp'),
 ]
 
 for sdk_target in SdkHelpers.sdk_targets:
@@ -127,8 +129,8 @@ builder.Add(symtest)
 # Purges CUtlLeanVectors, including over external buffers
 lvtest = builder.ProgramProject('utlleanvector_test')
 lvtest.sources = [
-  os.path.join('tests', 'run', 'utlleanvector.cpp'),
-  os.path.join('public', 'tier0', 'memoverride.cpp'),
+  os.path.join(builder.sourcePath, 'tests', 'run', 'utlleanvector.cpp'),
+  os.path.join(builder.sourcePath, 'public', 'tier0', 'memoverride.cpp'),
 ]
 
 for sdk_target in SdkHelpers.sdk_targets:
@@ -140,8 +142,8 @@ builder.Add(lvtest)
 # Inserts dupes and non copyable elements into a CUtlRBTree and a CUtlOrderedMap
 maptest = builder.ProgramProject('utlrbtree_test')
 maptest.sources = [
-  os.path.join('tests', 'run', 'utlrbtree.cpp'),
-  os.path.join('public', 'tier0', 'memoverride.cpp'),
+  os.path.join(builder.sourcePath, 'tests', 'run', 'utlrbtree.cpp'),
+  os.path.join(builder.sourcePath, 'public', 'tier0', 'memoverride.cpp'),
 ]
 
 for sdk_target in SdkHelpers.sdk_targets:
@@ -153,8 +155,8 @@ builder.Add(maptest)
 # Copies and moves CBufferStrings through tier0
 bstest = builder.ProgramProject('bufferstring_test')
 bstest.sources = [
-  os.path.join('tests', 'run', 'bufferstring.cpp'),
-  os.path.join('public', 'tier0', 'memoverride.cpp'),
+  os.path.join(builder.sourcePath, 'tests', 'run', 'bufferstring.cpp'),
+  os.path.join(builder.sourcePath, 'public', 'tier0', 'memoverride.cpp'),
 ]
 
 for sdk_target in SdkHelpers.sdk_targets:
@@ -166,8 +168,8 @@ builder.Add(bstest)
 # Serializes KeyValues into CmdKeyValues messages and parses them back through tier0
 cmdkvtest = builder.ProgramProject('cmdkeyvalues_test')
 cmdkvtest.sources = [
-  os.path.join('tests', 'run', 'cmdkeyvalues.cpp'),
-  os.path.join('public', 'tier0', 'memoverride.cpp'),
+  os.path.join(builder.sourcePath, 'tests', 'run', 'cmdkeyvalues.cpp'),
+  os.path.join(builder.sourcePath, 'public', 'tier0', 'memoverride.cpp'),
 ]
 
 for sdk_target in SdkHelpers.sdk_targets:

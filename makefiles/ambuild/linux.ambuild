@@ -1,0 +1,46 @@
+# vim: set ts=2 sw=2 tw=99 noet ft=python:
+#
+# Linux (GCC / Clang) settings of the SDK's own code -- AMBuild twin of
+# makefiles/cmake/linux.cmake.
+
+def ConfigureCxx(cxx, options):
+  cxx.cflags += [
+    '-Wall',
+    '-Werror',
+    '-Wno-overloaded-virtual',
+    '-Wno-non-virtual-dtor',
+    '-Wno-delete-non-virtual-dtor',
+    '-Wno-invalid-offsetof',
+    '-Wno-unknown-pragmas',
+    '-Wno-unused',
+    '-Wno-narrowing',
+    '-Wno-register',
+    '-fPIC'
+  ]
+
+  cxx.defines += [
+    'COMPILER_GCC'
+  ]
+
+  cxx.cxxflags += [
+    '-std=c++20'
+  ]
+
+  if options.opt == '1':
+    cxx.cflags += ['-O3']
+
+  if options.debug == '1':
+    cxx.cflags += ['-g3']
+
+  cxx.defines += ['_LINUX', 'LINUX', 'POSIX', 'GNUC']
+  cxx.cflags += ['-march=nocona', '-mmmx', '-msse', '-msse2']
+
+  # Set of defines required by the HL2SDK
+  cxx.defines += [
+    '_finite=finite',
+    'stricmp=strcasecmp', '_stricmp=strcasecmp',
+    'strnicmp=strncasecmp', '_strnicmp=strncasecmp',
+    'strcmpi=strcasecmp',
+    '_vsnprintf=vsnprintf',
+    '_alloca=alloca'
+  ]

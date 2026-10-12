@@ -1,0 +1,83 @@
+# vim: set ts=2 sw=2 tw=99 noet ft=python:
+#
+# The SDK's libraries -- AMBuild twin of makefiles/cmake/CMakeBuilder.cmake:
+# interfaces, mathlib and libprotobuf, with the same sources in the same order.
+import os, re
+
+builder.SetBuildFolder('/')
+
+def Source(*path):
+  return os.path.join(builder.sourcePath, *path)
+
+# interfaces
+project = builder.StaticLibraryProject('interfaces')
+project.sources = [
+  Source('interfaces', 'interfaces.cpp'),
+]
+
+for cxx in HL2SDK.targets:
+  HL2SDK.ConfigureLibrary(project, cxx, builder)
+
+HL2SDK.libs += builder.Add(project)
+
+# mathlib
+project = builder.StaticLibraryProject('mathlib')
+project.sources = [Source('mathlib', file) for file in [
+  'almostequal.cpp',
+  'anorms.cpp',
+  'bumpvects.cpp',
+  'color_conversion.cpp',
+  'halton.cpp',
+  'icekey.cpp',
+  'imagequant.cpp',
+  'lightdesc.cpp',
+  'mathlib_base.cpp',
+  'polyhedron.cpp',
+  'powsse.cpp',
+  'quantize.cpp',
+  'randsse.cpp',
+  'simdvectormatrix.cpp',
+  'sparse_convolution_noise.cpp',
+  'spherical.cpp',
+  'sse.cpp',
+  'sseconst.cpp',
+  'ssenoise.cpp',
+  'vmatrix.cpp',
+]]
+
+for cxx in HL2SDK.targets:
+  binary = HL2SDK.ConfigureLibrary(project, cxx, builder)
+  binary.compiler.cxxincludes += [
+    Source('public', 'mathlib')
+  ]
+
+HL2SDK.libs += builder.Add(project)
+
+# libprotobuf: the sources its own CMake build compiles
+protobuf_dir = Source('thirdparty', 'protobuf-3.21.8')
+
+def CMakeSources(file, variable):
+  with open(os.path.join(protobuf_dir, 'cmake', file)) as fp:
+    files = re.search(r'set\(' + variable + r'\s(.*?)\)', fp.read(), re.S).group(1)
+  return [os.path.join(protobuf_dir, file) for file in re.findall(r'\$\{protobuf_SOURCE_DIR\}/(\S+\.cc)', files)]
+
+project = builder.StaticLibraryProject('libprotobuf')
+project.sources = CMakeSources('libprotobuf-lite.cmake', 'libprotobuf_lite_files') + CMakeSources('libprotobuf.cmake', 'libprotobuf_files')
+
+for cxx in HL2SDK.targets:
+  binary = HL2SDK.ConfigureLibrary(project, cxx, builder)
+  binary.compiler.cxxincludes += [
+    os.path.join(protobuf_dir, 'src')
+  ]
+
+  # Third-party code, so its warnings are left to upstream
+  if binary.compiler.like('msvc'):
+    binary.compiler.cflags += ['/w', '/EHsc', '/utf-8', '/bigobj']
+  else:
+    binary.compiler.cflags += ['-w']
+
+  # The engine's and the prebuilt library's std::string ABI
+  if binary.compiler.target.platform == 'linux':
+    binary.compiler.defines += ['_GLIBCXX_USE_CXX11_ABI=0']
+
+HL2SDK.libs += builder.Add(project)

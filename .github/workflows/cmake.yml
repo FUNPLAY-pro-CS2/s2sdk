@@ -5,10 +5,12 @@ on:
   push:
     paths:
       - CMakeLists.txt
+      - makefiles/cmake/**
       - .github/workflows/cmake.yml
   pull_request:
     paths:
       - CMakeLists.txt
+      - makefiles/cmake/**
       - .github/workflows/cmake.yml
 
 jobs:
@@ -28,10 +30,21 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Build the libraries
+      - name: Build the libraries and the checks
         shell: bash
         run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DS2SDK_BUILD_TESTS=ON
           cmake --build build --config ${{ matrix.build_type }}
           ls -R build/lib
+
+      - name: Test
+        if: startsWith(runner.os, 'Linux')
+        shell: bash
+        run: |
+          LD_LIBRARY_PATH=lib/linux64 build/keyvalues3_test
+          LD_LIBRARY_PATH=lib/linux64 build/utliterators_test
+          LD_LIBRARY_PATH=lib/linux64 build/utlsymbollarge_test
+          LD_LIBRARY_PATH=lib/linux64 build/utlleanvector_test
+          LD_LIBRARY_PATH=lib/linux64 build/bufferstring_test
+          LD_LIBRARY_PATH=lib/linux64 build/cmdkeyvalues_test
 

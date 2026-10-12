@@ -48,10 +48,10 @@ jobs:
           path: repository
 
       - uses: actions/checkout@v7
-        name: hl2sdk-manifests checkout
+        name: s2sdk-manifests checkout
         with:
-          repository: alliedmodders/hl2sdk-manifests
-          path: hl2sdk-manifests
+          repository: FUNPLAY-pro-CS2/s2sdk-manifests
+          path: s2sdk-manifests
 
       - uses: actions/checkout@v7
         name: AMBuild checkout
@@ -83,7 +83,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          python3 ../configure.py --hl2sdk-manifests ../../hl2sdk-manifests ${{ matrix.configure_args }}
+          python3 ../configure.py --s2sdk-manifests ../../s2sdk-manifests --no-cmake ${{ matrix.configure_args }}
           ambuild
 
       - name: Test

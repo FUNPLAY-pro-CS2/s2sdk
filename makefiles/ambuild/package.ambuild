@@ -1,0 +1,23 @@
+# vim: set ts=8 sts=2 sw=2 tw=99 et ft=python:
+#
+# Where the built libraries go -- AMBuild twin of makefiles/cmake/package.cmake:
+# lib/ in the build folder, laid out like the repository's lib/.
+import os
+
+# Output matches the repository's lib folder
+builder.SetBuildFolder('lib')
+
+folder_map = {}
+for task in HL2SDK.libs:
+  if task.target.platform == 'windows':
+    folder = os.path.join('public', 'win64')
+  else:
+    folder = 'linux64'
+  if folder not in folder_map:
+    folder_map[folder] = builder.AddFolder(folder)
+  # Under the names of the repository's lib/ (interfaces.a, not libinterfaces.a):
+  # AMBuild 2.2 gives every static library a 'lib' prefix outside Windows
+  name = os.path.basename(task.binary.path)
+  if task.target.platform != 'windows' and name.startswith('lib'):
+    name = name[len('lib'):]
+  builder.AddCopy(task.binary, os.path.join(folder, name))

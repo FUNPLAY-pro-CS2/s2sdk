@@ -1,0 +1,23 @@
+# vim: set ts=2 sw=2 tw=99 noet ft=python:
+#
+# Windows (MSVC) settings of the SDK's own code -- AMBuild twin of
+# makefiles/cmake/windows.cmake.
+
+def ConfigureCxx(cxx, options):
+  cxx.defines += ['COMPILER_MSVC', 'COMPILER_MSVC64']
+
+  cxx.cxxflags += [
+    '/std:c++20'
+  ]
+
+  if options.opt == '1':
+    cxx.cflags += ['/Ox', '/Zo']
+
+  if options.debug == '1':
+    cxx.cflags += ['/MTd', '/Od', '/RTC1']
+    cxx.linkflags += ['/NODEFAULTLIB:libcmt']
+    # The game is built without iterator debugging, which changes the layout of STL types,
+    # like the strings in protobuf messages that plugins share with the game
+    cxx.defines += ['_ITERATOR_DEBUG_LEVEL=0']
+
+  cxx.defines += ['_WINDOWS', 'WINDOWS', 'WIN32', 'WIN64', '_CRT_SECURE_NO_DEPRECATE', '_CRT_NONSTDC_NO_DEPRECATE']
