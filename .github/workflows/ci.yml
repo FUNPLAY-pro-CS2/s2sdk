@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v7
         name: s2sdk-manifests checkout
         with:
-          repository: FUNPLAY-pro-CS2/s2sdk-manifests
+          repository: Source2Mod/s2sdk-manifests
           path: s2sdk-manifests
 
       - uses: actions/checkout@v7

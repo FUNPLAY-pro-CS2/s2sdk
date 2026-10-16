@@ -10,7 +10,7 @@ project(s2sdk LANGUAGES C CXX)
 #
 # It describes nothing for projects that build against the SDK: AMBuild projects
 # get that from hl2sdk-manifests, CMake projects from s2sdk-manifests
-# (https://github.com/FUNPLAY-pro-CS2/s2sdk-manifests).
+# (https://github.com/Source2Mod/s2sdk-manifests).
 #
 # S2SDK_TARGET_PREFIX names the targets (s2sdk by default), so a project can
 # build the libraries of several games, each under its own prefix.
